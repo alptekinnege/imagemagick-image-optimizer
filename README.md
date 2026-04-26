@@ -4,7 +4,7 @@ Resize images in a folder with ImageMagick. Output files keep the same format an
 
 ## Requirements
 - Python 3.8+
-- ImageMagick installed and `magick` available in PATH
+- ImageMagick installed and either `magick` or `convert` available in PATH
 
 ## Usage
 
@@ -33,7 +33,7 @@ python optimizer.py --input "C:\\path\\to\\images" --suffix "_resized" --max-hei
 - `--max-height`: Maximum height in pixels
 - `--recursive`: Process subfolders
 - `--extensions`: Comma-separated list of extensions (default: common image types)
-- `--magick-path`: Path to `magick.exe` if not in PATH
+- `--magick-path`: Path to `magick.exe` (or equivalent ImageMagick binary) if not in PATH
 - `--overwrite`: Overwrite output files if they exist
 - `--dry-run`: Print ImageMagick commands without running them
 
@@ -42,6 +42,7 @@ python optimizer.py --input "C:\\path\\to\\images" --suffix "_resized" --max-hei
 - Output format is the same as the input file extension.
 - Images are resized proportionally to fit within the max width/height.
 - Files whose names already end with the suffix are skipped to avoid reprocessing.
+- The tool resolves `magick` first, then falls back to `convert` when `magick` is unavailable.
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

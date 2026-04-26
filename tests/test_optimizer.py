@@ -41,6 +41,14 @@ def test_resolve_magick_in_path(monkeypatch):
     assert optimizer.resolve_magick(None) == "C:\\magick"
 
 
+def test_resolve_magick_falls_back_to_convert(monkeypatch):
+    def mock_which(name):
+        return {"magick": None, "convert": "/usr/bin/convert"}.get(name)
+
+    monkeypatch.setattr(shutil, "which", mock_which)
+    assert optimizer.resolve_magick(None) == "/usr/bin/convert"
+
+
 def test_resolve_magick_missing(monkeypatch):
     monkeypatch.setattr(shutil, "which", lambda name: None)
     with pytest.raises(SystemExit):

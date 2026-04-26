@@ -45,8 +45,13 @@ def resolve_magick(path_override):
     if magick:
         return magick
 
+    convert = shutil.which("convert")
+    if convert:
+        return convert
+
     print(
-        "magick not found in PATH. Install ImageMagick and ensure 'magick' is available.",
+        "ImageMagick command not found in PATH. Install ImageMagick and ensure "
+        "'magick' or 'convert' is available.",
         file=sys.stderr,
     )
     sys.exit(2)
