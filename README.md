@@ -6,6 +6,10 @@ Resize images in a folder with ImageMagick. Output files keep the same format an
 - Python 3.8+
 - ImageMagick installed and `magick` available in PATH
 
+On Ubuntu/Debian, ImageMagick 6 may install the command as `convert` instead of
+`magick`. If `magick` is missing, either install an ImageMagick package that
+provides it or pass the command path explicitly with `--magick-path`.
+
 ## Usage
 
 Basic example:
@@ -47,10 +51,12 @@ python optimizer.py --input "C:\\path\\to\\images" --suffix "_resized" --max-hei
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Development & Tests
-Install dev dependencies and run tests:
+Create a virtual environment, install dev dependencies, and run tests:
 
 ```
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
-pytest
+python -m pytest
 ```
 
