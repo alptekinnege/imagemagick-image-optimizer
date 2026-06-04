@@ -99,6 +99,7 @@ def process_images(
     }
 
     start = perf_counter()
+    created_dirs: Set[Path] = set()
 
     for path in iter_files(input_dir, recursive):
         if not path.is_file():
@@ -133,7 +134,11 @@ def process_images(
             print("DRY-RUN:", " ".join(cmd))
             continue
 
-        out_path.parent.mkdir(parents=True, exist_ok=True)
+        parent = out_path.parent
+        if parent not in created_dirs:
+            parent.mkdir(parents=True, exist_ok=True)
+            created_dirs.add(parent)
+
         result = subprocess.run(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
