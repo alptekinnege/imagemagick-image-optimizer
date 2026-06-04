@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from time import perf_counter
 from typing import Optional, Set
@@ -101,6 +102,8 @@ def process_images(
     start = perf_counter()
     created_dirs: Set[Path] = set()
 
+    tasks = []
+
     for path in iter_files(input_dir, recursive):
         if not path.is_file():
             continue
@@ -138,18 +141,25 @@ def process_images(
         if parent not in created_dirs:
             parent.mkdir(parents=True, exist_ok=True)
             created_dirs.add(parent)
+        tasks.append((path, cmd))
 
+    def run_command(task):
+        path, cmd = task
         result = subprocess.run(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
-        if result.returncode != 0:
-            stats["errors"] += 1
-            print(f"ERROR: {path}", file=sys.stderr)
-            if result.stderr:
-                print(result.stderr.strip(), file=sys.stderr)
-            continue
+        return path, result
 
-        stats["processed"] += 1
+    if tasks:
+        with ThreadPoolExecutor() as executor:
+            for path, result in executor.map(run_command, tasks):
+                if result.returncode != 0:
+                    stats["errors"] += 1
+                    print(f"ERROR: {path}", file=sys.stderr)
+                    if result.stderr:
+                        print(result.stderr.strip(), file=sys.stderr)
+                else:
+                    stats["processed"] += 1
 
     elapsed = perf_counter() - start
     stats["elapsed"] = elapsed
