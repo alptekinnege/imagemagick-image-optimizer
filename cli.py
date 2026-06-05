@@ -51,6 +51,8 @@ def _validate_output_format(value: Optional[str]) -> Optional[str]:
     fmt = value.lower().lstrip(".")
     if not fmt:
         raise argparse.ArgumentTypeError("--format cannot be empty.")
+    if "/" in fmt or "\\" in fmt or Path(fmt).name != fmt:
+        raise argparse.ArgumentTypeError("--format must not contain path separators.")
     return fmt
 
 

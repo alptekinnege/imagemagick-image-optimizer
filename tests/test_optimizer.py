@@ -2,6 +2,7 @@ from pathlib import Path
 import subprocess
 import shutil
 import sys
+import argparse
 import pytest
 
 import core
@@ -50,6 +51,25 @@ class TestResolveMagick:
 
 
 class TestCLI:
+    def test_validate_output_format(self):
+        # Valid formats
+        assert cli._validate_output_format("jpg") == "jpg"
+        assert cli._validate_output_format(".png") == "png"
+        assert cli._validate_output_format("tar.gz") == "tar.gz"
+
+        # Invalid formats containing path separators
+        with pytest.raises(argparse.ArgumentTypeError, match="must not contain path separators"):
+            cli._validate_output_format("a/b")
+
+        with pytest.raises(argparse.ArgumentTypeError, match="must not contain path separators"):
+            cli._validate_output_format("../foo")
+
+        with pytest.raises(argparse.ArgumentTypeError, match="must not contain path separators"):
+            cli._validate_output_format("\\foo")
+
+        with pytest.raises(argparse.ArgumentTypeError, match="must not contain path separators"):
+            cli._validate_output_format("C:\\foo")
+
     def test_dry_run_integration(self, tmp_path, monkeypatch, capsys):
         d = tmp_path / "imgs"
         d.mkdir()
